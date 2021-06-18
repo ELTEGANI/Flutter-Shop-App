@@ -40,11 +40,25 @@ class Products with ChangeNotifier{
   Product findById(String id){
     return _items.firstWhere((element) => element.id == id);
   }
+
+  // void showFavoriteOnly(){
+  //  _showFavorite = true;
+  //  notifyListeners();
+  // }
+  //
+  // void showAll(){
+  //   _showFavorite = false;
+  //   notifyListeners();
+  // }
+
+  List<Product> get favoriteItems{
+    return _items.where((productItem) => productItem.isFavorite).toList();
+  }
+
   List<Product> get items {
     return [..._items];
   }
   void addProduct(){
-    // _items.add(value);
     notifyListeners();
   }
 }
