@@ -23,6 +23,7 @@ class ProductOverViewScreen extends StatefulWidget{
 class _ProductOverViewScreenState extends State<ProductOverViewScreen> {
   var _showOnlyFavorite = false;
   var _isInit = true;
+  var _isLoading = false;
 
   @override
   void initState(){
@@ -36,7 +37,14 @@ class _ProductOverViewScreenState extends State<ProductOverViewScreen> {
   @override
   void didChangeDependencies() {
     if(_isInit){
-      Provider.of<Products>(context).fetchAndSetProducts();
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<Products>(context).fetchAndSetProducts().then((value) => {
+      setState(() {
+        _isLoading = false;
+      })
+      });
     }
     _isInit = false;
     super.didChangeDependencies();
@@ -80,7 +88,7 @@ class _ProductOverViewScreenState extends State<ProductOverViewScreen> {
       ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(_showOnlyFavorite),
+      body:_isLoading ? Center(child: CircularProgressIndicator(),) : ProductsGrid(_showOnlyFavorite),
     );
   }
 }
