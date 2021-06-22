@@ -92,11 +92,7 @@ class EditProductScreen extends StatefulWidget {
       _isLoading = true;
     });
     if(_editProduct.id != null){
-      Provider.of<Products>(context,listen: false).updateProduct(_editProduct.id,_editProduct);
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.of(context).pop();
+      await Provider.of<Products>(context,listen: false).updateProduct(_editProduct.id,_editProduct);
     }else{
       try{
         await Provider.of<Products>(context,listen: false)
@@ -111,13 +107,18 @@ class EditProductScreen extends StatefulWidget {
           ],
           )
         );
-      }finally{
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
       }
+      // finally{
+      //   setState(() {
+      //     _isLoading = false;
+      //   });
+      //   Navigator.of(context).pop();
+      // }
     }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop();
   }
 
   @override
@@ -239,7 +240,7 @@ class EditProductScreen extends StatefulWidget {
                ),
                Expanded(
                    child: TextFormField(
-                       decoration: InputDecoration(labelText: 'Image URL'),
+                     decoration: InputDecoration(labelText: 'Image URL'),
                      keyboardType: TextInputType.url,
                      textInputAction: TextInputAction.done,
                      controller: _imageUrlController,
