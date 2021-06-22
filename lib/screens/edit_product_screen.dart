@@ -98,7 +98,17 @@ class EditProductScreen extends StatefulWidget {
       });
       Navigator.of(context).pop();
     }else{
-      Provider.of<Products>(context,listen: false).addProduct(_editProduct).then((value) => {
+      Provider.of<Products>(context,listen: false)
+          .addProduct(_editProduct)
+          .catchError((error){
+           return showDialog<Null>(context: context, builder:(ctx) => AlertDialog(title:Text('An error Occurred'),
+           content: Text('Something went wrong'),
+           actions: <Widget>[
+             FlatButton(onPressed:(){
+               Navigator.of(context).pop();
+             }, child: Text('Okay'))
+           ],));
+      }).then((value) => {
       setState(() {
       _isLoading = false;
       }),
