@@ -33,6 +33,7 @@ class EditProductScreen extends StatefulWidget {
      'imageUrl':'',
    };
    var _isInit = true;
+   var _isLoading = false;
    @override
   void initState() {
     _imageFocusNode.addListener(_updateImageUrl);
@@ -87,12 +88,23 @@ class EditProductScreen extends StatefulWidget {
       return;
     }
     _form.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
     if(_editProduct.id != null){
       Provider.of<Products>(context,listen: false).updateProduct(_editProduct.id,_editProduct);
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
     }else{
-      Provider.of<Products>(context,listen: false).addProduct(_editProduct);
+      Provider.of<Products>(context,listen: false).addProduct(_editProduct).then((value) => {
+      setState(() {
+      _isLoading = false;
+      }),
+      Navigator.of(context).pop()
+      });
     }
-    Navigator.of(context).pop();
 
   }
 
@@ -109,7 +121,7 @@ class EditProductScreen extends StatefulWidget {
                  icon:Icon(Icons.save))
            ],
          ),
-       body:Padding(
+       body:_isLoading ? Center(child:CircularProgressIndicator(),) : Padding(
          padding: const EdgeInsets.all(8.0),
          child: Form(
            key: _form,
