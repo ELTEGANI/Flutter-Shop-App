@@ -148,7 +148,7 @@ class Products with ChangeNotifier{
   }
 
   Future<void> addProduct(Product product){
-    final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products.json');
+    final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products');
     return http.post(url,body: json.encode({
       'title':product.title,
       'description':product.description,
@@ -166,6 +166,9 @@ class Products with ChangeNotifier{
        );
        _items.insert(0, newProduct);
        notifyListeners();
+    }).catchError((onError){
+       print(onError);
+       throw onError;
     });
   }
 
