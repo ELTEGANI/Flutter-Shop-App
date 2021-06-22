@@ -82,7 +82,7 @@ class EditProductScreen extends StatefulWidget {
   }
 
 
-  void _saveForm(){
+  Future <void> _saveForm() async{
     final _isValid = _form.currentState.validate();
     if(!_isValid){
       return;
@@ -98,24 +98,26 @@ class EditProductScreen extends StatefulWidget {
       });
       Navigator.of(context).pop();
     }else{
-      Provider.of<Products>(context,listen: false)
-          .addProduct(_editProduct)
-          .catchError((error){
-           return showDialog<Null>(context: context, builder:(ctx) => AlertDialog(title:Text('An error Occurred'),
-           content: Text('Something went wrong'),
-           actions: <Widget>[
-             FlatButton(onPressed:(){
-               Navigator.of(context).pop();
-             }, child: Text('Okay'))
-           ],));
-      }).then((value) => {
-      setState(() {
-      _isLoading = false;
-      }),
-      Navigator.of(context).pop()
-      });
+      try{
+        await Provider.of<Products>(context,listen: false)
+            .addProduct(_editProduct);
+      }catch(error){
+        await showDialog(context: context, builder:(ctx) => AlertDialog(title:Text('An error Occurred'),
+          content: Text('Something went wrong'),
+          actions: <Widget>[
+            FlatButton(onPressed:(){
+              Navigator.of(context).pop();
+            }, child: Text('Okay'))
+          ],
+          )
+        );
+      }finally{
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
+      }
     }
-
   }
 
   @override
