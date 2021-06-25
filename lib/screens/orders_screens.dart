@@ -19,7 +19,7 @@ class OrdersScreen extends StatelessWidget{
         if(dataSnapShot.connectionState == ConnectionState.waiting){
           return Center(child: CircularProgressIndicator());
         }else{
-          if(dataSnapShot.error != null){
+          if(dataSnapShot.error == null){
             return Center(child: Text('An Error Occurred'),);
           }else{
              return Consumer<Orders>(builder:(ctx,orderData,ch)=>ListView.builder(

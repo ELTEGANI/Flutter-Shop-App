@@ -15,15 +15,25 @@ class Products with ChangeNotifier{
     return _items.where((productItem) => productItem.isFavorite).toList();
   }
 
+  final String authToken;
+  final String userId;
+
+  Products(this.authToken,this.userId,this._items);
+
+
   List<Product> get items {
     return [..._items];
   }
 
-  Future <void> fetchAndSetProducts() async {
-    final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products.json');
+  Future <void> fetchAndSetProducts([bool filterByUser= false]) async {
+    var filterString = filterByUser ? 'orderBy="createId"&equalTo="$userId"' : '';
+    var url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken&$filterString');
     try{
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String,dynamic>;
+      url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/userfavorties/$userId.json?auth=$authToken');
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product>loadedProducts = [];
       extractedData.forEach((productId,productData) {
           loadedProducts.insert(0,Product(
@@ -31,7 +41,7 @@ class Products with ChangeNotifier{
              title:productData['title'],
              description:productData['description'],
              price:productData['price'],
-             isFavorite:productData['isFavorite'],
+             isFavorite:favoriteData == null ? false : favoriteData[productId] ?? false,
              imageUrl:productData['imageUrl']
           ));
       });
@@ -43,14 +53,14 @@ class Products with ChangeNotifier{
   }
 
   Future<void> addProduct(Product product) async{
-    final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products.json');
+    var url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken');
     try {
       final response = await http.post(url, body: json.encode({
         'title': product.title,
         'description': product.description,
         'imageUrl': product.imageUrl,
         'price': product.price,
-        'isFavorite': product.isFavorite,
+        'createId':userId
       }),
       );
       final newProduct = Product(
@@ -70,7 +80,7 @@ class Products with ChangeNotifier{
   Future<void> updateProduct(String id,Product newProduct) async{
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if(prodIndex >= 0){
-      final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json');
+      final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json?auth=$authToken');
       await http.patch(url,body:json.encode({
         'title':newProduct.title,
         'description': newProduct.description,
@@ -86,7 +96,7 @@ class Products with ChangeNotifier{
   }
 
   Future <void> deleteProduct(String id) async{
-    final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json');
+    final url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products/$id.json?auth=$authToken');
     final existingProductIndex = _items.indexWhere((element) => element.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);
