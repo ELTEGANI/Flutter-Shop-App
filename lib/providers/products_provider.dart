@@ -26,7 +26,7 @@ class Products with ChangeNotifier{
   }
 
   Future <void> fetchAndSetProducts([bool filterByUser= false]) async {
-    var filterString = filterByUser ? 'orderBy="createId"&equalTo="$userId"' : '';
+    var filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
     var url = Uri.parse('https://test-dawana-default-rtdb.asia-southeast1.firebasedatabase.app/products.json?auth=$authToken&$filterString');
     try{
       final response = await http.get(url);

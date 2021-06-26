@@ -114,7 +114,8 @@ class _AuthCardState extends State<AuthCard> {
      )
      );
   }
-  Future<void> _submit() async{
+
+  Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
@@ -123,31 +124,37 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    try{
+    try {
       if (_authMode == AuthMode.Login) {
         // Log user in
-        await Provider.of<Auth>(context,listen: false).signIn(_authData['email'],_authData['password']);
+        await Provider.of<Auth>(context, listen: false).signIn(
+          _authData['email'],
+          _authData['password'],
+        );
       } else {
         // Sign user up
-        await Provider.of<Auth>(context,listen: false).signUp(_authData['email'],_authData['password']);
+        await Provider.of<Auth>(context, listen: false).signUp(
+          _authData['email'],
+          _authData['password'],
+        );
       }
-      Navigator.of(context).pushReplacementNamed('');
-    } on  HttpException catch(error){
-      var errorMessage = 'Authentication Failed';
-      if(error.toString().contains('EMAIL_EXISTS')){
-        errorMessage = 'This Email Address is already in use';
-      } else if (error.toString().contains('INVALID_EMAIL')){
-        errorMessage = 'This is Not Valid Email Address';
-      } else if(error.toString().contains('WEAK_PASSWORD')){
-        errorMessage = 'This password is too weak';
-      }else if(error.toString().contains('EMAIL_NOT_FOUND')){
-        errorMessage = 'The Email Not Found';
-      }else if(error.toString().contains('INVALID_PASSWORD')){
-        errorMessage = 'Invalid Password';
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication failed';
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = 'This email address is already in use.';
+      } else if (error.toString().contains('INVALID_EMAIL')) {
+        errorMessage = 'This is not a valid email address';
+      } else if (error.toString().contains('WEAK_PASSWORD')) {
+        errorMessage = 'This password is too weak.';
+      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'Could not find a user with that email.';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid password.';
       }
       _showErrorDialog(errorMessage);
-    }catch(error){
-      const errorMessage = 'We cant authenticate you. Please try later';
+    } catch (error) {
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
       _showErrorDialog(errorMessage);
     }
 
